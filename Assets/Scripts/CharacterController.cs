@@ -1,3 +1,4 @@
+using System.Threading;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -5,6 +6,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] CharacterController characterController;
     [SerializeField] private float speed;
     [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private Collider melee;
+
+
 
     private void Update()
     {
@@ -27,24 +31,26 @@ public class PlayerController : MonoBehaviour
             position.y = transform.position.y;
             transform.LookAt(position);
         }
-
-        //Disparar
-        //
+        //Melee
         if (Input.GetMouseButtonDown(0))
         {
-            Ray fireRay = new Ray(transform.position + Vector3.up, transform.forward);
-            RaycastHit enemyInfo;
+            melee.enabled = true;
+            Invoke("NoMelee", 0.2f);
 
-            Debug.DrawRay(fireRay.origin, fireRay.direction * 10, Color.green, 10f);
-
-            if (Physics.Raycast(fireRay.origin, fireRay.direction, out enemyInfo, 100f, enemyLayer))
-            {
-                Debug.Log(enemyInfo.transform.gameObject.name);
-            }
-            else
-            {
-                Debug.Log("No rec");
-            }
+            Debug.Log("Melee");
         }
     }
+    private void OnTriggerEnter(Collider other)
+    {
+
+        if (((1 << other.gameObject.layer & enemyLayer) != 0))
+        {
+            Debug.Log("Auch");
+        }
+    }
+    void NoMelee()
+    {
+        melee.enabled = false;
+    }
+
 }
