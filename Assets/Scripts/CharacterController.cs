@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 
@@ -7,6 +9,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private Collider melee;
+    [SerializeField] private float interactableRadius;
 
 
 
@@ -39,6 +42,42 @@ public class PlayerController : MonoBehaviour
 
             Debug.Log("Melee");
         }
+
+
+    }
+    private void Interactable()
+    {
+        IInteractable closestInteractable = null;
+
+        List<Collider> interactableColliders = Physics.OverlapSphere(transform.position + transform.forward, interactableRadius).ToList();
+        float closestDistance = 1000f;
+
+        if (interactableColliders.Count > 0)
+        {
+            foreach (Collider collider in interactableColliders)
+            {
+                if (collider.transform.TryGetComponent<IInteractable>(out IInteractable interactable))
+                {
+                    if (Vector3.Distance(collider.transform.position, transform.position) < closestDistance)
+                    {
+                        closestInteractable = interactable;
+                        closestDistance = Vector3.Distance(collider.transform.position, transform.position);
+                    }
+                }
+            }
+        }
+        else
+        {
+            closestInteractable = null;
+        }
+
+
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            // "?" checa si es null
+            closestInteractable?.Interact();
+        }
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -52,5 +91,11 @@ public class PlayerController : MonoBehaviour
     {
         melee.enabled = false;
     }
+    public void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(transform.position + transform.forward, interactableRadius);
+    }
 
 }
+    
