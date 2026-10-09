@@ -552,7 +552,7 @@ GameObject:
   m_Component:
   - component: {fileID: 564723540}
   - component: {fileID: 564723542}
-  - component: {fileID: 564723541}
+  - component: {fileID: 564723543}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -577,24 +577,6 @@ Transform:
   - {fileID: 1776646858}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &564723541
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 564723539}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e505a4bcf445e7242ad233148c6605d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  characterController: {fileID: 564723542}
-  speed: 10
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  melee: {fileID: 304631571}
 --- !u!143 &564723542
 CharacterController:
   m_ObjectHideFlags: 0
@@ -620,6 +602,27 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &564723543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564723539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0f2a95c2d268784ba15ea8a3f644a65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  characterController: {fileID: 564723542}
+  speed: 10
+  interactableRadius: 1
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  melee: 0
+  primaryBullet: 0
+  shootTimer: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
