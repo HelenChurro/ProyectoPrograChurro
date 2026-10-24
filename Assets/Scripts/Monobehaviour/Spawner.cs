@@ -1,35 +1,59 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    private Coroutine spawningCoroutine;
-    [Header("Spawning")]
-    [SerializeField] private GameObject enemy;
-    [SerializeField] private Transform[] position;
-    [SerializeField] private int amount;
-    [SerializeField] private float timeBetweenSpawns;
+    [Header("Enemis")]
+    [SerializeField] private GameObject dayEnemyPrefab;
+    [SerializeField] private GameObject nightBossPrefab;
 
-    private void Awake()
-    {
-        StartSpawning();
-    }
-    public void StartSpawning()
-    {
-        if (spawningCoroutine != null) { return; }
+    [Header("Spawners")]
+    [SerializeField] private Transform[] spawnPositions;
 
-        spawningCoroutine = StartCoroutine(Spawning());
-    }
+    private List<GameObject> activeNightEnemies = new List<GameObject>();
 
-    private IEnumerator Spawning()
+    // Día
+    public IEnumerator DaySpawningRoutine(float duration)
     {
-        for (int i = 0; i < 5; i++)
+        float timer = 0f;
+        while (timer < duration)
         {
-            int spawningLocation = Random.Range(0, position.Length - 1);
-            Instantiate(enemy, position[spawningLocation].position, Quaternion.identity);
+            if (spawnPositions.Length > 0 && dayEnemyPrefab != null)
+            {
+                int randomIndex = Random.Range(0, spawnPositions.Length);
+                Instantiate(dayEnemyPrefab, spawnPositions[randomIndex].position, Quaternion.identity);
+                Debug.Log("Spawneando enemigo de día al azar.");
+            }
 
-            yield return new WaitForSeconds(timeBetweenSpawns);
+            // espera
+            float waitTime = Random.Range(4f, 8f);
+            yield return new WaitForSeconds(waitTime);
+            timer += waitTime;
         }
-        yield return null;
+    }
+
+    // Nochecita Enemis grandes
+    public List<GameObject> SpawnNightWave(int amount)
+    {
+        activeNightEnemies.Clear();
+
+        for (int i = 0; i < amount; i++)
+        {
+            if (spawnPositions.Length > 0 && nightBossPrefab != null)
+            {
+                int randomIndex = Random.Range(0, spawnPositions.Length);
+                GameObject boss = Instantiate(nightBossPrefab, spawnPositions[randomIndex].position, Quaternion.identity);
+
+                //Noche
+                Enemy enemyScript = boss.GetComponent<Enemy>();
+                if (enemyScript != null) enemyScript.isNightBoss = true;
+
+                activeNightEnemies.Add(boss);
+            }
+        }
+
+        Debug.Log("¡OLEADA son {amount} enemigos!");
+        return activeNightEnemies;
     }
 }

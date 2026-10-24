@@ -1,33 +1,73 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IDanable
 {
-    [SerializeField] private float detectionRadius;
-    [SerializeField] private float attackRadius;
+    [SerializeField] private float detectionRadius = 10f;
+    [SerializeField] private float attackRadius = 2f;
     [SerializeField] private LayerMask playerMask;
     [SerializeField] private NavMeshAgent agent;
+    [SerializeField] private int damage = 10;
 
+    [field: SerializeField] public int Health { get; set; } = 20;
+
+    [Header("Tipo de Enemigo")]
+    public bool isNightBoss = false; // NocheDia
+
+    [SerializeField] private GameObject pickUpPrefab;
+    [Range(0f, 1f)][SerializeField] private float dropChance = 1f;
 
     private void Update()
     {
-        //Deteccion de jugador
-        if (Physics.CheckSphere(transform.position, detectionRadius, playerMask))
+        PlayerController player = FindAnyObjectByType<PlayerController>();
+        if (player == null) return;
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
+        if (isNightBoss || distanceToPlayer <= detectionRadius)
         {
-            agent.SetDestination(FindAnyObjectByType<PlayerController>().transform.position);
+            agent.SetDestination(player.transform.position);
         }
-        //Ataque al jugador
-        if (Physics.CheckSphere(transform.position, attackRadius, playerMask))
+
+        if (distanceToPlayer <= attackRadius)
         {
-            Vector3 direction = FindAnyObjectByType<PlayerController>().transform.position - transform.position;
+            Vector3 direction = player.transform.position - transform.position;
             Ray attackRay = new Ray(transform.position, direction);
 
             Debug.DrawRay(transform.position, direction * attackRadius, Color.red);
             if (Physics.Raycast(attackRay, attackRadius, playerMask))
             {
-                Debug.Log("hit player");
+                player.TakeDamage(damage);
             }
         }
+    }
+
+    public void TakeDamage(int amount)
+    {
+        Health -= amount;
+        Debug.Log("Hit enemi " + Health);
+
+        if (Health <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        if (pickUpPrefab != null && Random.value <= dropChance)
+        {
+            Instantiate(pickUpPrefab, transform.position, Quaternion.identity);
+        }
+
+        //Semuere
+        DayNightManager manager = FindAnyObjectByType<DayNightManager>();
+        if (manager != null)
+        {
+            manager.OnEnemyKilled(this);
+        }
+
+        Destroy(gameObject);
     }
 
     private void OnDrawGizmos()
